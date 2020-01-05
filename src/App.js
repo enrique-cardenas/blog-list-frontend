@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -11,6 +12,8 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [notificationSuccess, setNotificationSuccess] = useState(null)
 
   useEffect(() => {
     blogService
@@ -42,6 +45,12 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
+     setNotificationMessage('wrong username or password')
+      setNotificationSuccess(false)
+      setTimeout(() => {
+        setNotificationMessage(null)
+        setNotificationSuccess(null)
+      }, 5000)
     }
   }
 
@@ -55,6 +64,12 @@ const App = () => {
     try {
       const data = await blogService.create(blogObject)
       setBlogs(blogs.concat(data))
+      setNotificationMessage(`a new blog ${title} by ${author} added`)
+      setNotificationSuccess(true)
+      setTimeout(() => {
+        setNotificationMessage(null)
+        setNotificationSuccess(null)
+      }, 5000)
       setTitle('')
       setAuthor('')
       setUrl('')
@@ -65,6 +80,7 @@ const App = () => {
   const loginForm = () => (
     <>
     <h2>Log in to application</h2>
+    <Notification message={notificationMessage} success={notificationSuccess}/>
     <form onSubmit={handleLogin}>
       <div>
         username
@@ -94,15 +110,18 @@ const App = () => {
     setUser(null)
   }
 
-  const blogRows = () => (
+  const blogRows = () => blogs.map(blog =>
+    <Blog key={blog.id} blog={blog} />
+  )
+
+  const blogDisplay = () => (
     <>
     <h2>blogs</h2>
+    <Notification message={notificationMessage} success={notificationSuccess}/>
     {user.name} logged in
     <button onClick={logoutButton}>logout</button>
     {blogForm()}
-    {blogs.map(blog =>
-      <Blog key={blog.id} blog={blog} />
-    )}
+    {blogRows()}
     </>
   )
 
@@ -147,7 +166,7 @@ const App = () => {
 
       {user === null ?
         loginForm() :
-        blogRows()
+        blogDisplay()
       }
 
     </div>
