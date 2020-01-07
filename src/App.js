@@ -3,6 +3,8 @@ import Blog from './components/Blog'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import BlogForm from './components/BlogForm'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -114,52 +116,42 @@ const App = () => {
     <Blog key={blog.id} blog={blog} />
   )
 
+
+  const handleTitleChange = ({ target }) => {
+    setTitle(target.value)
+  }
+
+  const handleAuthorChange = ({ target }) => {
+    setAuthor(target.value)
+  }
+
+  const handleUrlChange = ({ target }) => {
+    setUrl(target.value)
+  }
+
+  const blogFormRef = React.createRef()
+
   const blogDisplay = () => (
     <>
     <h2>blogs</h2>
     <Notification message={notificationMessage} success={notificationSuccess}/>
     {user.name} logged in
     <button onClick={logoutButton}>logout</button>
-    {blogForm()}
+    <Togglable buttonLabel="new note" ref={blogFormRef}>
+      <BlogForm 
+        onSubmit={addBlog}
+        handleTitleChange={handleTitleChange}
+        handleAuthorChange={handleAuthorChange}
+        handleUrlChange={handleUrlChange}
+        title={title} 
+        author={author}
+        url={url}
+      />
+    </Togglable>
     {blogRows()}
     </>
   )
 
-  const blogForm = () => (
-    <>
-    <h2>create new</h2>
-    <form onSubmit={addBlog}>
-      <div>
-        title:
-          <input
-          type="text"
-          value={title}
-          name="Title"
-          onChange={({ target }) => setTitle(target.value)}
-        />
-      </div>
-      <div>
-        author:
-          <input
-          type="text"
-          value={author}
-          name="Author"
-          onChange={({ target }) => setAuthor(target.value)}
-        />
-      </div>
-      <div>
-        url:
-          <input
-          type="text"
-          value={url}
-          name="URL"
-          onChange={({ target }) => setUrl(target.value)}
-        />
-      </div>
-      <button type="submit">create</button>
-    </form>
-    </>
-  ) 
 
   return (
     <div className="App">
