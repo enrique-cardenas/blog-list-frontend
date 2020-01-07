@@ -116,19 +116,6 @@ const App = () => {
     <Blog key={blog.id} blog={blog} />
   )
 
-
-  const handleTitleChange = ({ target }) => {
-    setTitle(target.value)
-  }
-
-  const handleAuthorChange = ({ target }) => {
-    setAuthor(target.value)
-  }
-
-  const handleUrlChange = ({ target }) => {
-    setUrl(target.value)
-  }
-
   const blogFormRef = React.createRef()
 
   const blogDisplay = () => (
@@ -140,9 +127,9 @@ const App = () => {
     <Togglable buttonLabel="new note" ref={blogFormRef}>
       <BlogForm
         onSubmit={addBlog}
-        handleTitleChange={handleTitleChange}
-        handleAuthorChange={handleAuthorChange}
-        handleUrlChange={handleUrlChange}
+        handleTitleChange={({ target }) => setTitle(target.value)}
+        handleAuthorChange={({ target }) => setAuthor(target.value)}
+        handleUrlChange={({ target }) => setUrl(target.value)}
         title={title}
         author={author}
         url={url}
@@ -151,7 +138,6 @@ const App = () => {
     {blogRows()}
     </>
   )
-
 
   return (
     <div className="App">
