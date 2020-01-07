@@ -138,12 +138,12 @@ const App = () => {
     {user.name} logged in
     <button onClick={logoutButton}>logout</button>
     <Togglable buttonLabel="new note" ref={blogFormRef}>
-      <BlogForm 
+      <BlogForm
         onSubmit={addBlog}
         handleTitleChange={handleTitleChange}
         handleAuthorChange={handleAuthorChange}
         handleUrlChange={handleUrlChange}
-        title={title} 
+        title={title}
         author={author}
         url={url}
       />
