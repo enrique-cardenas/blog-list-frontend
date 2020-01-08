@@ -1,6 +1,6 @@
-import React, { useState, useReducer } from 'react'
+import React, { useState } from 'react'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, updateLikes }) => {
   const [displayInfo, setInfoDisplay] = useState(false)
 
   const blogStyle = {
@@ -21,7 +21,7 @@ const Blog = ({ blog }) => {
           <div>{blog.url}</div>
           <div>
             {blog.likes} likes
-            <button onClick={() => console.log('like button clicked')}>like</button>
+            <button onClick={updateLikes}>like</button>
           </div>
           <div>added by {blog.user.name}</div>
         </>

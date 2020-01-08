@@ -79,6 +79,16 @@ const App = () => {
     }
   }
 
+  const updateLikes = blog => {
+    const updatedBlog = {...blog, likes: blog.likes + 1}
+    blogService
+      .update(updatedBlog)
+      .then(returnedBlog => {
+        setBlogs(blogs.map(curBlog => 
+          curBlog.id !== updatedBlog.id ? curBlog : returnedBlog))
+      })
+  }
+
   const loginForm = () => (
     <>
     <h2>Log in to application</h2>
@@ -113,29 +123,33 @@ const App = () => {
   }
 
   const blogRows = () => blogs.map(blog =>
-    <Blog key={blog.id} blog={blog} />
+    <Blog 
+      key={blog.id} 
+      blog={blog} 
+      updateLikes={() => updateLikes(blog)}
+    />
   )
 
   const blogFormRef = React.createRef()
 
   const blogDisplay = () => (
     <>
-    <h2>blogs</h2>
-    <Notification message={notificationMessage} success={notificationSuccess}/>
-    {user.name} logged in
-    <button onClick={logoutButton}>logout</button>
-    <Togglable buttonLabel="new note" ref={blogFormRef}>
-      <BlogForm
-        onSubmit={addBlog}
-        handleTitleChange={({ target }) => setTitle(target.value)}
-        handleAuthorChange={({ target }) => setAuthor(target.value)}
-        handleUrlChange={({ target }) => setUrl(target.value)}
-        title={title}
-        author={author}
-        url={url}
-      />
-    </Togglable>
-    {blogRows()}
+      <h2>blogs</h2>
+      <Notification message={notificationMessage} success={notificationSuccess}/>
+      {user.name} logged in
+      <button onClick={logoutButton}>logout</button>
+      <Togglable buttonLabel="new note" ref={blogFormRef}>
+        <BlogForm
+          onSubmit={addBlog}
+          handleTitleChange={({ target }) => setTitle(target.value)}
+          handleAuthorChange={({ target }) => setAuthor(target.value)}
+          handleUrlChange={({ target }) => setUrl(target.value)}
+          title={title}
+          author={author}
+          url={url}
+        />
+      </Togglable>
+      {blogRows()}
     </>
   )
 
