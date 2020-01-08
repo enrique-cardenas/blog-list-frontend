@@ -23,6 +23,9 @@ const App = () => {
       .then(initialBlogs => setBlogs(initialBlogs))
   }, [])
 
+  // sorted by likes
+  //const sortedBlogs = blogs.sort((a, b) => a.likes - b.likes)
+
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogListUser')
     if (loggedUserJSON) {
@@ -81,9 +84,11 @@ const App = () => {
 
   const updateLikes = blog => {
     const updatedBlog = {...blog, likes: blog.likes + 1}
+    {console.log('updatedLikes blog object', updatedBlog)}
     blogService
       .update(updatedBlog)
       .then(returnedBlog => {
+        console.log('returned blog object', returnedBlog)
         setBlogs(blogs.map(curBlog => 
           curBlog.id !== updatedBlog.id ? curBlog : returnedBlog))
       })
