@@ -92,13 +92,15 @@ const App = () => {
       })
   }
 
-  const deleteBlog = id => {
-    blogService
-      .remove(id)
-      .then(returnedBlog => {
-        setBlogs(blogs.filter(curBlog => 
-          curBlog.id !== id))
-      })
+  const deleteBlog = (title, author, id) => {
+    if (window.confirm(`remove blog ${title} by ${author}?`)){
+      blogService
+        .remove(id)
+        .then(returnedBlog => {
+          setBlogs(blogs.filter(curBlog => 
+            curBlog.id !== id))
+        })
+    }
   }
 
   const loginForm = () => (
@@ -139,7 +141,7 @@ const App = () => {
       key={blog.id} 
       blog={blog} 
       updateLikes={() => updateLikes(blog)}
-      deleteBlog={() => deleteBlog(blog.id)}
+      deleteBlog={() => deleteBlog(blog.title, blog.author, blog.id)}
     />
   )
 
