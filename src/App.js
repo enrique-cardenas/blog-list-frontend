@@ -23,7 +23,7 @@ const App = () => {
       .then(initialBlogs => setBlogs(initialBlogs))
   }, [])
 
-  // sorted by likes
+  // sort by likes
   blogs.sort((a, b) => a.likes - b.likes)
 
   useEffect(() => {
@@ -87,9 +87,17 @@ const App = () => {
     blogService
       .update(updatedBlog)
       .then(returnedBlog => {
-        console.log('returned blog object', returnedBlog)
         setBlogs(blogs.map(curBlog => 
           curBlog.id !== updatedBlog.id ? curBlog : returnedBlog))
+      })
+  }
+
+  const deleteBlog = id => {
+    blogService
+      .remove(id)
+      .then(returnedBlog => {
+        setBlogs(blogs.filter(curBlog => 
+          curBlog.id !== id))
       })
   }
 
@@ -131,6 +139,7 @@ const App = () => {
       key={blog.id} 
       blog={blog} 
       updateLikes={() => updateLikes(blog)}
+      deleteBlog={() => deleteBlog(blog.id)}
     />
   )
 
