@@ -44,13 +44,13 @@ const App = () => {
 
       window.localStorage.setItem(
         'loggedBlogListUser', JSON.stringify(user)
-      ) 
+      )
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
     } catch (exception) {
-     setNotificationMessage('wrong username or password')
+      setNotificationMessage('wrong username or password')
       setNotificationSuccess(false)
       setTimeout(() => {
         setNotificationMessage(null)
@@ -66,28 +66,26 @@ const App = () => {
       author: author,
       url: url
     }
-    try {
-      const data = await blogService.create(blogObject)
-      setBlogs(blogs.concat(data))
-      setNotificationMessage(`a new blog ${title} by ${author} added`)
-      setNotificationSuccess(true)
-      setTimeout(() => {
-        setNotificationMessage(null)
-        setNotificationSuccess(null)
-      }, 5000)
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-    } catch (exception) {
-    }
+
+    const data = await blogService.create(blogObject)
+    setBlogs(blogs.concat(data))
+    setNotificationMessage(`a new blog ${title} by ${author} added`)
+    setNotificationSuccess(true)
+    setTimeout(() => {
+      setNotificationMessage(null)
+      setNotificationSuccess(null)
+    }, 5000)
+    setTitle('')
+    setAuthor('')
+    setUrl('')
   }
 
   const updateLikes = blog => {
-    const updatedBlog = {...blog, likes: blog.likes + 1}
+    const updatedBlog = { ...blog, likes: blog.likes + 1 }
     blogService
       .update(updatedBlog)
       .then(returnedBlog => {
-        setBlogs(blogs.map(curBlog => 
+        setBlogs(blogs.map(curBlog =>
           curBlog.id !== updatedBlog.id ? curBlog : returnedBlog))
       })
   }
@@ -97,7 +95,7 @@ const App = () => {
       blogService
         .remove(id)
         .then(returnedBlog => {
-          setBlogs(blogs.filter(curBlog => 
+          setBlogs(blogs.filter(curBlog =>
             curBlog.id !== id))
         })
     }
@@ -105,29 +103,29 @@ const App = () => {
 
   const loginForm = () => (
     <>
-    <h2>Log in to application</h2>
-    <Notification message={notificationMessage} success={notificationSuccess}/>
-    <form onSubmit={handleLogin}>
-      <div>
-        username
+      <h2>Log in to application</h2>
+      <Notification message={notificationMessage} success={notificationSuccess}/>
+      <form onSubmit={handleLogin}>
+        <div>
+          username
           <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
+            type="text"
+            value={username}
+            name="Username"
+            onChange={({ target }) => setUsername(target.value)}
+          />
+        </div>
+        <div>
+          password
           <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>      
+            type="password"
+            value={password}
+            name="Password"
+            onChange={({ target }) => setPassword(target.value)}
+          />
+        </div>
+        <button type="submit">login</button>
+      </form>
     </>
   )
 
@@ -137,9 +135,9 @@ const App = () => {
   }
 
   const blogRows = () => blogs.map(blog =>
-    <Blog 
-      key={blog.id} 
-      blog={blog} 
+    <Blog
+      key={blog.id}
+      blog={blog}
       updateLikes={() => updateLikes(blog)}
       deleteBlog={() => deleteBlog(blog.title, blog.author, blog.id)}
       currentUser={user}
@@ -181,4 +179,4 @@ const App = () => {
   )
 }
 
-export default App;
+export default App
