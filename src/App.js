@@ -68,6 +68,7 @@ const App = () => {
     }
     try {
       const data = await blogService.create(blogObject)
+      console.log('response data', data)
       setBlogs(blogs.concat(data))
       setNotificationMessage(`a new blog ${title} by ${author} added`)
       setNotificationSuccess(true)
@@ -142,6 +143,7 @@ const App = () => {
       blog={blog} 
       updateLikes={() => updateLikes(blog)}
       deleteBlog={() => deleteBlog(blog.title, blog.author, blog.id)}
+      currentUser={user}
     />
   )
 
