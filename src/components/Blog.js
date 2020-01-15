@@ -12,7 +12,7 @@ const Blog = ({ blog, updateLikes, deleteBlog, currentUser }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog'>
       <div onClick={() => setInfoDisplay(!displayInfo)} className='blogName'>
         {blog.title} {blog.author}
       </div>
