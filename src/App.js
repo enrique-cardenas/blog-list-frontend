@@ -5,17 +5,18 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
+import  { useField } from './hooks'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationSuccess, setNotificationSuccess] = useState(null)
+  const username = useField('text')
+  const password = useField('text')
 
   useEffect(() => {
     blogService
@@ -39,7 +40,7 @@ const App = () => {
     event.preventDefault()
     try {
       const user = await loginService.login({
-        username, password,
+        username: username.formInput.value, password: password.formInput.value
       })
 
       window.localStorage.setItem(
@@ -47,8 +48,8 @@ const App = () => {
       )
       blogService.setToken(user.token)
       setUser(user)
-      setUsername('')
-      setPassword('')
+      username.reset()
+      password.reset()
     } catch (exception) {
       setNotificationMessage('wrong username or password')
       setNotificationSuccess(false)
@@ -108,21 +109,11 @@ const App = () => {
       <form onSubmit={handleLogin}>
         <div>
           username
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
+          <input { ...username.formInput } />
         </div>
         <div>
           password
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
+          <input { ...password.formInput } />
         </div>
         <button type="submit">login</button>
       </form>
@@ -169,12 +160,10 @@ const App = () => {
 
   return (
     <div className="App">
-
       {user === null ?
         loginForm() :
         blogDisplay()
       }
-
     </div>
   )
 }
