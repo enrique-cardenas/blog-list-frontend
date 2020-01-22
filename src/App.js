@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
-import blogService from './services/blogs'
+//import blogService from './services/blogs'
 import loginService from './services/login'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
-import  { useField } from './hooks'
+import  { useField, useResource } from './hooks'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
@@ -17,12 +16,7 @@ const App = () => {
   const [notificationSuccess, setNotificationSuccess] = useState(null)
   const username = useField('text')
   const password = useField('text')
-
-  useEffect(() => {
-    blogService
-      .getAll()
-      .then(initialBlogs => setBlogs(initialBlogs))
-  }, [])
+  const [ blogs, blogService ] = useResource('/api/blogs')
 
   // sort by likes
   blogs.sort((a, b) => a.likes - b.likes)
@@ -32,7 +26,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
-      blogService.setToken(user.token)
+      blogService.setTokenState(user.token)
     }
   }, [])
 
@@ -46,7 +40,7 @@ const App = () => {
       window.localStorage.setItem(
         'loggedBlogListUser', JSON.stringify(user)
       )
-      blogService.setToken(user.token)
+      blogService.setTokenState(user.token)
       setUser(user)
       username.reset()
       password.reset()
@@ -60,7 +54,7 @@ const App = () => {
     }
   }
 
-  const addBlog = async (event) => {
+  const addBlog = (event) => {
     event.preventDefault()
     const blogObject = {
       title: title,
@@ -68,8 +62,7 @@ const App = () => {
       url: url
     }
 
-    const data = await blogService.create(blogObject)
-    setBlogs(blogs.concat(data))
+    blogService.create(blogObject)
     setNotificationMessage(`a new blog ${title} by ${author} added`)
     setNotificationSuccess(true)
     setTimeout(() => {
@@ -83,22 +76,13 @@ const App = () => {
 
   const updateLikes = blog => {
     const updatedBlog = { ...blog, likes: blog.likes + 1 }
-    blogService
-      .update(updatedBlog)
-      .then(returnedBlog => {
-        setBlogs(blogs.map(curBlog =>
-          curBlog.id !== updatedBlog.id ? curBlog : returnedBlog))
-      })
+    blogService.update(updatedBlog)
   }
+
 
   const deleteBlog = (title, author, id) => {
     if (window.confirm(`remove blog ${title} by ${author}?`)){
-      blogService
-        .remove(id)
-        .then(returnedBlog => {
-          setBlogs(blogs.filter(curBlog =>
-            curBlog.id !== id))
-        })
+      blogService.remove(id)
     }
   }
 
