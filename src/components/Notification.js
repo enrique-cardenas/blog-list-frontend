@@ -7,15 +7,15 @@ const Notification = ({ message, success }) => {
 
   return (
     <>
-    {success ? 
-      <div className='successfulOperation'>
-        {message}
-      </div>
-      :
-      <div className='unsuccessfulOperation'>
-        {message}
-      </div>
-    }
+      {success ? 
+        <div className='successfulOperation'>
+          {message}
+        </div>
+        :
+        <div className='unsuccessfulOperation'>
+          {message}
+        </div>
+      }
     </>
   )
 }
