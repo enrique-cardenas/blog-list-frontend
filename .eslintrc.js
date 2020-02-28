@@ -16,12 +16,13 @@ module.exports = {
       "sourceType": "module"
   },
   "plugins": [
-      "react", "jest", "react-hooks"
+      "react", "jest", "react-hooks", "react-hooks"
   ],
   "rules": {
       "indent": [
           "error",
-          2
+          2,
+          { "SwitchCase": 1 }  
       ],
       "linebreak-style": [
           "error",
@@ -45,6 +46,6 @@ module.exports = {
       ],
       "no-console": 0,
       "react/prop-types": 0,
-      "react-hooks/rules-of-hooks": "error"
+      "react-hooks/rules-of-hooks": "error",
   }
 };
