@@ -1,40 +1,63 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { connect } from 'react-redux'
+import { createBlog, removeBlog, updateBlog, addComment }
+  from '../reducers/blogReducer'
+import  { useField } from '../hooks'
 
-const Blog = ({ blog, updateLikes, deleteBlog, currentUser }) => {
-  const [displayInfo, setInfoDisplay] = useState(false)
+const Blog = ( props ) => {
+  const comment = useField('text')
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 5,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
+  if(props.blog === undefined) return null
+
+
+  const updateLikes = () => {
+    const updatedBlog = { ...props.blog, likes: props.blog.likes + 1 }
+    props.updateBlog(updatedBlog)
+  }
+
+  const addComment = event => {
+    event.preventDefault()
+    const commentObject = { comment: comment.formInput.value }
+    props.addComment(props.blog.id, commentObject)
+    comment.reset()
   }
 
   return (
-    <div style={blogStyle} className='blog'>
-      <div onClick={() => setInfoDisplay(!displayInfo)} className='blogName'>
-        {blog.title} {blog.author}
+    <div className='blog'>
+      <h2>{props.blog.title}</h2>
+      <a href={props.blog.url}>{props.blog.url}</a>
+      <div>
+        {props.blog.likes} likes
+        <button onClick={updateLikes}>like</button>
       </div>
-      {displayInfo ?
-        <>
-          <div>{blog.url}</div>
-          <div>
-            {blog.likes} likes
-            <button onClick={updateLikes}>like</button>
-          </div>
-          <div>added by {blog.user.name}</div>
-          {currentUser.username === blog.user.username ? 
-            <button onClick={deleteBlog}>remove</button>
-            :
-            null
-          }
-        </>
-        :
-        null
-      }
+      <div>added by {props.blog.user.name}</div>
+
+      <div>
+        <h3>comments</h3>
+        <form onSubmit={addComment}>
+          <input { ...comment.formInput } />
+          <button type="submit">add comment</button>
+        </form>
+        <ul>
+          {props.blog.comments.map( ({_id : id, comment}) =>
+            <li key={id}>{comment}</li>
+          )}
+        </ul>
+
+      </div>
     </div>
   )
 }
 
-export default Blog
+const mapStateToProps = (state, ownProps) => {
+  return {
+    currentUser: state.currentUser,
+    blog: state.blogs.find(blog => blog.id === ownProps.id)
+  }
+}
+
+const mapDispatchToProps = {
+  createBlog, removeBlog, updateBlog, addComment
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Blog)

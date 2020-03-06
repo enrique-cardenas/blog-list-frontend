@@ -1,15 +1,29 @@
 import React, { useState, useEffect } from 'react'
+import {
+  BrowserRouter as Router,
+  Route, Link
+} from 'react-router-dom'
 import { connect } from 'react-redux'
+
+// import components
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
+import Users from './components/Users'
+import User from './components/User'
+import Menu from './components/Menu'
+
+// import custom hooks
 import  { useField } from './hooks'
 
+// import reducers
 import { initializeBlogs, createBlog, removeBlog, updateBlog }
   from './reducers/blogReducer'
 import { setNotification } from './reducers/notificationReducer'
-import { login, logout, getLoggedUser } from './reducers/userReducer'
+import { login, logout, getLoggedUser } from './reducers/currentUserReducer'
+import { getUsers } from './reducers/usersReducer'
+
 
 const App = (props) => {
   const [title, setTitle] = useState('')
@@ -24,9 +38,7 @@ const App = (props) => {
 
   useEffect(() => {
     props.initializeBlogs()
-  }, [])
-
-  useEffect(() => {
+    props.getUsers()
     const loggedUserJSON = window.localStorage.getItem('loggedBlogListUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
@@ -43,6 +55,7 @@ const App = (props) => {
 
   const addBlog = (event) => {
     event.preventDefault()
+    blogFormRef.current.toggleVisibility()
     const blogObject = {
       title: title,
       author: author,
@@ -55,17 +68,6 @@ const App = (props) => {
     setTitle('')
     setAuthor('')
     setUrl('')
-  }
-
-  const updateLikes = blog => {
-    const updatedBlog = { ...blog, likes: blog.likes + 1 }
-    props.updateBlog(updatedBlog)
-  }
-
-  const deleteBlog = (title, author, id) => {
-    if (window.confirm(`remove blog ${title} by ${author}?`)){
-      props.removeBlog(id)
-    }
   }
 
   const loginForm = () => (
@@ -86,29 +88,39 @@ const App = (props) => {
     </>
   )
 
-  const logoutButton = () => {
-    window.localStorage.clear()
-    props.logout()
-  }
+  const blogRows = () => {
 
-  const blogRows = () => props.blogs.map(blog =>
-    <Blog
-      key={blog.id}
-      blog={blog}
-      updateLikes={() => updateLikes(blog)}
-      deleteBlog={() => deleteBlog(blog.title, blog.author, blog.id)}
-      currentUser={props.user}
-    />
-  )
+    const blogStyle = {
+      paddingTop: 10,
+      paddingLeft: 5,
+      border: 'solid',
+      borderWidth: 1,
+      marginBottom: 5
+    }
+
+    return(
+      props.blogs.map(blog =>
+        <div key={blog.id} style={blogStyle} className='blog' >
+          <Link to={`/blogs/${blog.id}`}>
+            {blog.title}
+          </Link>
+        </div>
+      )
+    )
+  }
 
   const blogFormRef = React.createRef()
 
-  const blogDisplay = () => (
+  const displayMenu = () => (
     <>
+      <Menu />
       <h2>blogs</h2>
       <Notification />
-      {props.user.name} logged in
-      <button onClick={logoutButton}>logout</button>
+    </>
+  )
+
+  const displayBlogs = () => (
+    <>
       <Togglable buttonLabel="new note" ref={blogFormRef}>
         <BlogForm
           onSubmit={addBlog}
@@ -126,10 +138,25 @@ const App = (props) => {
 
   return (
     <div className="App">
-      {props.user === null ?
-        loginForm() :
-        blogDisplay()
-      }
+      <Router>
+        {props.currentUser === null ?
+          null :
+          displayMenu()
+        }
+        <Route exact path='/' render={() =>
+          props.currentUser === null ?
+            loginForm() :
+            displayBlogs()}
+        />
+        <Route path='/blogs/:id' render={({ match }) =>
+          <Blog id={match.params.id}/>
+        }/>
+        <Route exact path='/users' render={() => <Users />} />
+        <Route exact path='/users/:id' render={({ match }) =>
+          <User id={match.params.id}/>
+        }/>
+      </Router>
+
     </div>
   )
 }
@@ -137,8 +164,9 @@ const App = (props) => {
 const mapStateToProps = (state) => {
   return {
     blogs: state.blogs,
+    users: state.users,
     notification: state.notification,
-    user: state.user
+    currentUser: state.currentUser
   }
 }
 
@@ -150,7 +178,8 @@ const mapDispatchToProps = {
   updateBlog,
   login,
   logout,
-  getLoggedUser
+  getLoggedUser,
+  getUsers
 }
 
 const ConnectedApp = connect(
