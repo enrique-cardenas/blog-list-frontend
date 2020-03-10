@@ -5,7 +5,18 @@ import {
 } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-// import components
+// Material UI imports
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Container from '@material-ui/core/Container';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+
+// import local components
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import BlogForm from './components/BlogForm'
@@ -13,6 +24,7 @@ import Togglable from './components/Togglable'
 import Users from './components/Users'
 import User from './components/User'
 import Menu from './components/Menu'
+import LoginForm from './components/LoginForm'
 
 // import custom hooks
 import  { useField } from './hooks'
@@ -31,7 +43,7 @@ const App = (props) => {
   const [url, setUrl] = useState('')
 
   const username = useField('text')
-  const password = useField('text')
+  const password = useField('password')
 
   // sort by likes
   //blogs.sort((a, b) => a.likes - b.likes)
@@ -70,42 +82,21 @@ const App = (props) => {
     setUrl('')
   }
 
-  const loginForm = () => (
-    <>
-      <h2>Log in to application</h2>
-      <Notification />
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input { ...username.formInput } />
-        </div>
-        <div>
-          password
-          <input { ...password.formInput } />
-        </div>
-        <button type="submit">login</button>
-      </form>
-    </>
-  )
-
   const blogRows = () => {
-
-    const blogStyle = {
-      paddingTop: 10,
-      paddingLeft: 5,
-      border: 'solid',
-      borderWidth: 1,
-      marginBottom: 5
-    }
-
     return(
-      props.blogs.map(blog =>
-        <div key={blog.id} style={blogStyle} className='blog' >
-          <Link to={`/blogs/${blog.id}`}>
-            {blog.title}
-          </Link>
-        </div>
-      )
+      <TableContainer component={Paper}>
+        <Table aria-label="simple table">
+          <TableBody>
+            {props.blogs.map(blog =>
+              <TableRow key={blog.id}>
+                <TableCell>
+                  <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
     )
   }
 
@@ -114,7 +105,7 @@ const App = (props) => {
   const displayMenu = () => (
     <>
       <Menu />
-      <h2>blogs</h2>
+      <h2>blog app</h2>
       <Notification />
     </>
   )
@@ -122,15 +113,18 @@ const App = (props) => {
   const displayBlogs = () => (
     <>
       <Togglable buttonLabel="new note" ref={blogFormRef}>
-        <BlogForm
-          onSubmit={addBlog}
-          handleTitleChange={({ target }) => setTitle(target.value)}
-          handleAuthorChange={({ target }) => setAuthor(target.value)}
-          handleUrlChange={({ target }) => setUrl(target.value)}
-          title={title}
-          author={author}
-          url={url}
-        />
+        {toggleVisibility => (
+          <BlogForm
+            onSubmit={addBlog}
+            handleTitleChange={({ target }) => setTitle(target.value)}
+            handleAuthorChange={({ target }) => setAuthor(target.value)}
+            handleUrlChange={({ target }) => setUrl(target.value)}
+            title={title}
+            author={author}
+            url={url}
+            toggleVisibility={toggleVisibility}
+          />
+        )}
       </Togglable>
       {blogRows()}
     </>
@@ -138,25 +132,29 @@ const App = (props) => {
 
   return (
     <div className="App">
-      <Router>
-        {props.currentUser === null ?
-          null :
-          displayMenu()
-        }
-        <Route exact path='/' render={() =>
-          props.currentUser === null ?
-            loginForm() :
-            displayBlogs()}
-        />
-        <Route path='/blogs/:id' render={({ match }) =>
-          <Blog id={match.params.id}/>
-        }/>
-        <Route exact path='/users' render={() => <Users />} />
-        <Route exact path='/users/:id' render={({ match }) =>
-          <User id={match.params.id}/>
-        }/>
-      </Router>
-
+      <CssBaseline />
+      <Container maxWidth="sm">
+        <Router>
+          {props.currentUser === null ?
+            null :
+            displayMenu()
+          }
+          <Route exact path='/' render={() =>
+            props.currentUser === null ?
+              <LoginForm 
+                handleLogin={handleLogin} username={username} password={password} /> 
+              :
+              displayBlogs()}
+          />
+          <Route path='/blogs/:id' render={({ match }) =>
+            <Blog id={match.params.id}/>
+          }/>
+          <Route exact path='/users' render={() => <Users />} />
+          <Route exact path='/users/:id' render={({ match }) =>
+            <User id={match.params.id}/>
+          }/>
+        </Router>
+      </Container>
     </div>
   )
 }

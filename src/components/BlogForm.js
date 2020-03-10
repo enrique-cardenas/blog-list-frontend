@@ -1,5 +1,23 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Button } from '@material-ui/core'
+import Card from '@material-ui/core/Card';
+import TextField from '@material-ui/core/TextField';
+import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+
+
+const useStyles = makeStyles({
+  root: {
+    width: 275,
+    marginBottom: 10
+  },
+  title: {
+    fontSize: 14,
+  },
+})
 
 const BlogForm = ({
   onSubmit,
@@ -8,42 +26,49 @@ const BlogForm = ({
   handleUrlChange,
   title,
   author,
-  url
+  url,
+  toggleVisibility
 }) => {
+  const classes = useStyles();
+
   return(
-    <div>
-      <h2>create new</h2>
-      <form onSubmit={onSubmit}>
-        <div>
-          title:
-          <input
+    <Card className={classes.root} >
+      <CardContent>
+        <Typography className={classes.title} color="textSecondary" gutterBottom align="center">
+          create new note
+        </Typography>
+        <form onSubmit={onSubmit}>
+          <TextField
             type="text"
             value={title}
             name="Title"
             onChange={handleTitleChange}
+            label="title"
+            fullWidth
           />
-        </div>
-        <div>
-          author:
-          <input
+          <TextField
             type="text"
             value={author}
             name="Author"
             onChange={handleAuthorChange}
+            label="author"
+            fullWidth
           />
-        </div>
-        <div>
-          url:
-          <input
+          <TextField
             type="text"
             value={url}
             name="URL"
             onChange={handleUrlChange}
+            label="url"
+            fullWidth
           />
-        </div>
-        <button type="submit">create</button>
+      <CardActions>
+        <Button variant="outlined" color="inherit" type="submit">create</Button>
+        <Button variant="outlined" color="secondary" onClick={toggleVisibility}>cancel</Button>
+      </CardActions>
       </form>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
 
